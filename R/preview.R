@@ -1,15 +1,12 @@
+devtools::install_github("davidallen02/pamngr")
 library(magrittr)
 
-consensus <- read_data('nfp tch') %>%
-  dplyr::select(Dates, BN_SURVEY_MEDIAN) %>%
-  dplyr::left_join(
-    y = read_data('usurtot') %>% dplyr::select(Dates, BN_SURVEY_MEDIAN),
-    by = 'Dates'
-  ) %>%
-  dplyr::left_join(
-    y = read_data('ahe yoy%') %>% dplyr::select(Dates, BN_SURVEY_MEDIAN),
-    by = 'Dates'
-  ) %>%
+# source('./R/functions/read_data.R')
+# source('./R/functions/ppt_output.R')
+
+consensus <- pamngr::get_data("nfp tch", flds = "BN_SURVEY_MEDIAN") %>%
+  dplyr::left_join(pamngr::get_data('usurtot', flds = "BN_SURVEY_MEDIAN"), by = "dates") %>%
+  dplyr::left_join(pamngr::get_data('ahe yoy%', flds = "BN_SURVEY_MEDIAN"), by = "dates") %>%
   set_colnames(c('date','payrolls','u3','ahe')) %>%
   dplyr::filter(date == max(date))
 
@@ -23,21 +20,21 @@ payrolls <- consensus %>%
   dplyr::pull() %>%
   paste0('k') %>%
   grid::textGrob(gp = grid::gpar(fontsize = 40, col = '#850237'),
-                 just = 'bottom')
+                 just = 'center')
 
 u3 <- consensus %>%
   dplyr::select(u3) %>%
   dplyr::pull() %>%
   paste0('%')  %>%
   grid::textGrob(gp = grid::gpar(fontsize = 40, col = '#850237'),
-                              just = 'bottom')
+                              just = 'center')
 
 ahe <- consensus %>%
   dplyr::select(ahe) %>%
   dplyr::pull() %>%
   paste0('%') %>%
   grid::textGrob(gp = grid::gpar(fontsize = 40, col = '#850237'),
-                 just = 'bottom')
+                 just = 'center')
 
 
 title <- 'Employment Situation\n' %>% grid::textGrob(
@@ -74,6 +71,6 @@ gridExtra::grid.arrange(title,
                         payrolls, u3, ahe,
                         blank,
                         layout_matrix = lay) %>% 
-  ppt_output('preview')
+  pamngr::ppt_output('preview.png')
 
 
