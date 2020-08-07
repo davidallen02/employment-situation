@@ -1,13 +1,10 @@
 library(magrittr)
 
-source("./R/functions/ppt_output.R")
+employ_pop <- pamngr::get_data("usertot")
+employ_prime <- pamngr::get_data("user54sa")
 
-
-employ_pop <- readxl::read_excel(path = "./data/data.xlsx", sheet = "usertot", skip = 2)
-employ_prime <- readxl::read_excel(path = "./data/data.xlsx", sheet = "user54sa", skip = 2)
-
-employ_pop <- employ_pop %>%
-  dplyr::left_join(employ_prime, by = "Dates") %>%
+emplemploy_pop %>%
+  dplyr::left_join(employ_prime, by = "dates") %>%
   set_colnames(c("dates","Total Population","Prime Age")) %>%
   reshape2::melt(id.vars = "dates") 
 
@@ -26,6 +23,10 @@ p <- employ_pop %>%
     axis.text = ggplot2::element_text(size = ggplot2::rel(1.5))
   )
 
-p
+pamngr::join_sheets(c("usertot","user54sa")) %>%
+  set_colnames(c("dates", "Total Population","Prime Age")) %>%
+  reshape2::melt(id.vars = "dates") %>%
+  pamngr::lineplot() %>%
+  pamngr::pam_plot(plot_title = "Employment to Population Ratio") %>%
+  pamngr::all_output("employment-to-population")
 
-ppt_output(p, image.name = "employment-to-population")

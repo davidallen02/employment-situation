@@ -54,28 +54,12 @@ p <- payrolls_occup %>%
   ggplot2::scale_fill_manual(values = pamngr::pam.pal())
 
 p <- p %>%
-  pamngr::pam.plot(
-    plot.title = "Change in Nonfarm Payrolls by Industry",
-    plot.subtitle = paste0(periods, ", Seasonally Adjusted"),
-    x.lab = "Thousands of Jobs",
-    show.legend = FALSE
-  )
-
-
-q <- 13.33/3.25
-
-p2 <- p + ggplot2::theme(
-  text = ggplot2::element_text(size = 11/q),
-  line = ggplot2::element_line(size = 11/22/q),
-  rect = ggplot2::element_rect(size = 11/22/q),
-  plot.title = ggplot2::element_text(margin = ggplot2::margin(0, 0, 5.5/q, 0)),
-  plot.subtitle = ggplot2::element_text(margin = ggplot2::margin(0, 0, 5.5/q, 0)),
-  plot.margin = ggplot2::margin(5.5/q, 5.5/q, 5.5/q, 5.5/q),
-  axis.ticks.length = ggplot2::unit(2.75/q, units = "pt"),
-  plot.caption = ggplot2::element_text(margin = ggplot2::margin(5.5/q, 0, 0, 0))
-)
-
-ggplot2::ggsave(filename = "test.png", plot = p2, dpi = 300, width = 13.33/q, height = 6.75/q, units = "in")
-
-p %>%  pamngr::ppt_output("output/payrolls-by-occupation.png")
+  pamngr::pam_plot(
+    plot_title = "Change in Nonfarm Payrolls by Industry",
+    plot_subtitle = paste0(periods, ", Thousands"),
+    x_lab = "Thousands of Jobs",
+    show_legend = FALSE,
+    caption = FALSE
+  ) %>%
+  pamngr::all_output("payrolls-by-occupation")
 
