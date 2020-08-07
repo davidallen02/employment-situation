@@ -2,7 +2,8 @@ library(magrittr)
 
 rename_columns <- function(x){ 
   data.frame(security = x) %>%
-    dplyr::left_join(readxl::read_xlsx("data.xlsx", sheet = "key"), by = "security") %>%
+    dplyr::left_join(readxl::read_xlsx("data.xlsx", sheet = "key", col_types = "text"), 
+                     by = "security") %>%
     dplyr::select(name) %>%
     dplyr::pull() %>% 
     as.character() %>%
@@ -32,7 +33,9 @@ payrolls_occup <- pamngr::join_sheets(
   dplyr::group_by(variable) %>%
   dplyr::arrange(dates) %>%
   dplyr::mutate(change = value - dplyr::lag(value)) %>%
-  dplyr::slice_max(dates, n = 1) %>%
+  dplyr::filter(dates == lubridate::as_datetime("2020-07-31")) %>%
+  # dplyr::slice_max(dates, n = 1) %>%
+  dplyr::ungroup() %>%
   dplyr::mutate(
     dates = dates %>% format("%B %Y"),
     variable = variable %>%
@@ -48,18 +51,31 @@ periods <- payrolls_occup %>%
   unique()
 
 p <- payrolls_occup %>%
-  ggplot2::ggplot(ggplot2::aes(variable, change, fill = dates)) +
-  ggplot2::geom_bar(stat = "identity", position = "dodge") +
-  ggplot2::coord_flip() +
-  ggplot2::scale_fill_manual(values = pamngr::pam.pal())
-
-p <- p %>%
+  pamngr::barplot(x = "variable", y = "change", fill = "dates") %>%
   pamngr::pam_plot(
     plot_title = "Change in Nonfarm Payrolls by Industry",
     plot_subtitle = paste0(periods, ", Thousands"),
-    x_lab = "Thousands of Jobs",
     show_legend = FALSE,
     caption = FALSE
-  ) %>%
-  pamngr::all_output("payrolls-by-occupation")
+  )
+
+p <- p + ggplot2::coord_flip()
+
+p %>% pamngr::all_output("payrolls-by-occupation")
+
+# p <- payrolls_occup %>%
+#   ggplot2::ggplot(ggplot2::aes(variable, change, fill = dates)) +
+#   ggplot2::geom_bar(stat = "identity", position = "dodge") +
+#   ggplot2::coord_flip() +
+#   ggplot2::scale_fill_manual(values = pamngr::pam.pal())
+# 
+# p <- p %>%
+#   pamngr::pam_plot(
+#     plot_title = "Change in Nonfarm Payrolls by Industry",
+#     plot_subtitle = paste0(periods, ", Thousands"),
+#     x_lab = "Thousands of Jobs",
+#     show_legend = FALSE,
+#     caption = FALSE
+#   ) %>%
+#   pamngr::all_output("payrolls-by-occupation")
 
