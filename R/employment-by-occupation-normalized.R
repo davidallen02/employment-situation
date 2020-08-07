@@ -21,10 +21,10 @@ normalize_earliest <- function(x){
   y <- x/start_value*100
   
   return(y)
-  }
+}
 
 
-p <- pamngr::join_sheets(
+dat <- pamngr::join_sheets(
   c("usmmnatr",
     "usectot",
     "usmmmanu",
@@ -37,37 +37,26 @@ p <- pamngr::join_sheets(
     "usegtot")
 ) %>%
   dplyr::rename_all(rename_columns) %>%
-  dplyr::slice_tail(n = 7) %>% 
+  dplyr::filter(dates >= lubridate::as_datetime("2019-12-31")) %>%
+  # dplyr::slice_tail(n = 7) %>% 
   dplyr::mutate_if(is.numeric, normalize_earliest) %>%
   reshape2::melt(id.vars = "dates") %>%
   dplyr::mutate(variable = variable %>% 
                   stringr::str_replace_all("-", " ") %>%
-                  stringr::str_to_title()) %>%
-  ggplot2::ggplot(ggplot2::aes(dates, value, color = variable)) +
-  ggplot2::geom_line(color = "#850237", size = 2) +
-  ggplot2::facet_wrap(~ variable, ncol = 3) 
-  p <- p %>% pamngr::pam_plot(
+                  stringr::str_to_title())
+p <- dat %>%
+  pamngr::lineplot() %>%
+  pamngr::pam_plot(
     plot_title = "Employment by Occupation",
     plot_subtitle = "Normalized to December 2019",
-    caption = FALSE
-  ) %>%
-  pamngr::all_output("employment-normalized")
-  # ggplot2::theme(
-  #   plot.title = ggplot2::element_text(size = ggplot2::rel(2)),
-  #   plot.subtitle = ggplot2::element_text(size = ggplot2::rel(1.5)),    
-  #   strip.text = ggplot2::element_text(size = ggplot2::rel(.8)),
-  #   axis.text = ggplot2::element_text(size = ggplot2::rel(.8))
-  # )
+    show_legend = FALSE
+  )
 
+p <- p + 
+  ggplot2::facet_wrap(~ variable, ncol = 3) +
+  ggplot2::scale_color_manual(values = rep("#850237", 9))
 
-# ggplot2::ggsave(
-#   filename = "employment-normalized.png",
-#   plot = p,
-#   width = 6.5,
-#   height = 4,
-#   units = "in"
-# )
-
+p %>% pamngr::all_output("employment-by-occupation-normalized")
 
 
 
