@@ -1,4 +1,3 @@
-devtools::install_github("davidallen02/pamngr")
 library(magrittr)
 
 # source('./R/functions/read_data.R')
@@ -65,7 +64,7 @@ lay <- rbind(c(1,1,1),
              c(6,7,8),
              c(9,9,9))
 
-gridExtra::grid.arrange(title, 
+p <- gridExtra::grid.arrange(title, 
                         date,
                         subtitle.1, subtitle.2, subtitle.3, 
                         payrolls, u3, ahe,
