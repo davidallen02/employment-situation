@@ -33,8 +33,8 @@ payrolls_occup <- pamngr::join_sheets(
   dplyr::group_by(variable) %>%
   dplyr::arrange(dates) %>%
   dplyr::mutate(change = value - dplyr::lag(value)) %>%
-  dplyr::filter(dates == lubridate::as_datetime("2020-07-31")) %>%
-  # dplyr::slice_max(dates, n = 1) %>%
+  # dplyr::filter(dates == lubridate::as_datetime("2020-07-31")) %>%
+  dplyr::slice_max(dates, n = 1) %>%
   dplyr::ungroup() %>%
   dplyr::mutate(
     dates = dates %>% format("%B %Y"),
