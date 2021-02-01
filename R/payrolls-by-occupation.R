@@ -40,9 +40,9 @@ payrolls_occup <- pamngr::join_sheets(
     dates = dates %>% format("%B %Y"),
     variable = variable %>%
       stringr::str_replace_all("-", " ") %>%
-      stringr::str_to_title()
+      stringr::str_to_title() 
   ) %>%
-  dplyr::arrange(desc(value))
+  dplyr::arrange(desc(value)) 
 
 periods <- payrolls_occup %>%
   dplyr::ungroup() %>%
